@@ -268,8 +268,25 @@ function handleFormSubmission(e) {
         // Get next step from form data or button
         const nextStep = form.dataset.nextStep;
         if (nextStep) {
-            const [service, step] = nextStep.split('-');
-            goToNextStep(service, parseInt(step));
+            // Handle full filename format (e.g., "consumer-complaints-2")
+            if (nextStep.includes('.html')) {
+                window.location.href = nextStep;
+            } else if (nextStep.includes('-')) {
+                // Extract service and step from filename
+                const parts = nextStep.split('-');
+                if (parts.length >= 3) {
+                    // Format: service-name-step (e.g., "consumer-complaints-2")
+                    const step = parseInt(parts[parts.length - 1]);
+                    const service = parts.slice(0, -1).join('-');
+                    goToNextStep(service, step);
+                } else {
+                    // Format: service-step (e.g., "license-2")
+                    const [service, step] = parts;
+                    goToNextStep(service, parseInt(step));
+                }
+            } else {
+                window.location.href = nextStep + '.html';
+            }
         } else {
             showNotification('Form submitted successfully');
         }
